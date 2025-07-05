@@ -117,40 +117,83 @@ export class NearContractService {
 
   // Contract interaction methods
   async createIntent(tokenPair: string, minProfitThreshold: string): Promise<any> {
-    if (!this.contract || !this.isSignedIn()) {
-      // Return demo response
-      console.log('🎭 Demo mode: Creating intent', { tokenPair, minProfitThreshold });
-      return {
-        success: true,
-        intentId: `demo-intent-${Date.now()}`,
-        message: 'Demo intent created successfully'
-      };
-    }
-
     try {
       console.log('🚀 Creating intent on NEAR contract...');
       console.log('📊 Token Pair:', tokenPair);
       console.log('💰 Min Profit Threshold:', minProfitThreshold);
+      console.log('👤 Account:', this.getAccountId());
+      console.log('🔗 Contract ID:', this.contractId);
 
-      // For now, return demo response since contract doesn't exist
-      const result = {
-        success: true,
-        intentId: `intent-${Date.now()}`,
-        tokenPair,
-        minProfitThreshold,
-        message: 'Intent created successfully (demo mode)'
-      };
+      if (!this.isSignedIn()) {
+        throw new Error('Please connect your NEAR wallet first');
+      }
 
-      console.log('✅ Intent created successfully:', result);
-      return result;
-    } catch (error) {
-      console.error('❌ Error creating intent:', error);
-      // Return demo response on error
+      // Validate inputs
+      if (!tokenPair || !minProfitThreshold) {
+        throw new Error('Token pair and profit threshold are required');
+      }
+
+      const threshold = parseFloat(minProfitThreshold);
+      if (isNaN(threshold) || threshold <= 0 || threshold > 100) {
+        throw new Error('Profit threshold must be between 0.1% and 100%');
+      }
+
+      // For demo mode or if contract is not available
+      if (!this.contract || !this.contractId || this.contractId === 'demo') {
+        console.log('🎭 Demo mode: Creating intent', { tokenPair, minProfitThreshold });
+        
+        // Simulate processing time
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        
+        const result = {
+          success: true,
+          intentId: `demo-intent-${Date.now()}`,
+          tokenPair,
+          minProfitThreshold,
+          message: 'Intent created successfully in demo mode',
+          txHash: `demo-tx-${Date.now()}`
+        };
+
+        console.log('✅ Demo intent created successfully:', result);
+        return result;
+      }
+
+      // Real contract interaction
+      console.log('📝 Calling contract create_intent method...');
+      
+      const result = await this.contract.create_intent(
+        {
+          token_pair: tokenPair,
+          min_profit_threshold: minProfitThreshold
+        },
+        '300000000000000', // 300 TGas
+        '1000000000000000000000000' // 1 NEAR deposit
+      );
+
+      console.log('✅ Intent created successfully on contract:', result);
+      
       return {
         success: true,
-        intentId: `demo-intent-${Date.now()}`,
-        message: 'Demo intent created (fallback)'
+        intentId: result,
+        tokenPair,
+        minProfitThreshold,
+        message: 'Intent created successfully on NEAR blockchain',
+        txHash: result.transaction?.hash || 'pending'
       };
+
+    } catch (error: any) {
+      console.error('❌ Error creating intent:', error);
+      
+      // Handle specific NEAR errors
+      if (error.message?.includes('insufficient funds')) {
+        throw new Error('Insufficient NEAR balance. You need at least 1 NEAR to create an intent.');
+      } else if (error.message?.includes('User rejected')) {
+        throw new Error('Transaction was rejected. Please try again.');
+      } else if (error.message?.includes('network')) {
+        throw new Error('Network error. Please check your connection and try again.');
+      }
+      
+      throw new Error(error.message || 'Failed to create intent. Please try again.');
     }
   }
 
@@ -184,8 +227,7 @@ export class NearContractService {
       }
 
       console.log('📋 Fetching user intents from contract...');
-      // For now, return demo data
-      const intents = [];
+      const intents = await this.contract.get_user_intents({ user: accountId });
       console.log('✅ Fetched intents:', intents);
       return intents || [];
     } catch (error) {
@@ -202,12 +244,15 @@ export class NearContractService {
 
     try {
       console.log('⏸️ Pausing intent:', intentId);
-      const result = { success: true, message: 'Intent paused successfully' };
+      const result = await this.contract.pause_intent(
+        { intent_id: intentId },
+        '100000000000000' // 100 TGas
+      );
       console.log('✅ Intent paused successfully:', result);
-      return result;
+      return { success: true, message: 'Intent paused successfully' };
     } catch (error) {
       console.error('❌ Error pausing intent:', error);
-      return { success: true, message: 'Intent paused (fallback)' };
+      throw new Error('Failed to pause intent');
     }
   }
 
@@ -219,12 +264,15 @@ export class NearContractService {
 
     try {
       console.log('▶️ Resuming intent:', intentId);
-      const result = { success: true, message: 'Intent resumed successfully' };
+      const result = await this.contract.resume_intent(
+        { intent_id: intentId },
+        '100000000000000' // 100 TGas
+      );
       console.log('✅ Intent resumed successfully:', result);
-      return result;
+      return { success: true, message: 'Intent resumed successfully' };
     } catch (error) {
       console.error('❌ Error resuming intent:', error);
-      return { success: true, message: 'Intent resumed (fallback)' };
+      throw new Error('Failed to resume intent');
     }
   }
 
@@ -250,25 +298,28 @@ export class NearContractService {
       console.log('💎 NEAR Price:', nearPrice);
       console.log('🔷 ETH Price:', ethPrice);
 
+      const result = await this.contract.execute_arbitrage(
+        {
+          intent_id: intentId,
+          near_price: nearPrice,
+          eth_price: ethPrice
+        },
+        '300000000000000', // 300 TGas
+        '100000000000000000000000' // 0.1 NEAR deposit
+      );
+
       const profit = Math.abs(parseFloat(nearPrice) - parseFloat(ethPrice)) * 0.8;
-      const result = {
+      
+      console.log('✅ Arbitrage executed successfully:', result);
+      return {
         success: true,
-        executionId: `execution-${Date.now()}`,
+        executionId: result,
         profit: profit.toString(),
         message: 'Arbitrage executed successfully'
       };
-
-      console.log('✅ Arbitrage executed successfully:', result);
-      return result;
     } catch (error) {
       console.error('❌ Error executing arbitrage:', error);
-      const profit = Math.abs(parseFloat(nearPrice) - parseFloat(ethPrice)) * 0.8;
-      return {
-        success: true,
-        executionId: `fallback-execution-${Date.now()}`,
-        profit: profit.toString(),
-        message: 'Arbitrage executed (fallback)'
-      };
+      throw new Error('Failed to execute arbitrage');
     }
   }
 
@@ -312,7 +363,7 @@ export class NearContractService {
       }
 
       console.log('📈 Fetching execution history from contract...');
-      const history = [];
+      const history = await this.contract.get_execution_history({ user: accountId });
       console.log('✅ Fetched execution history:', history);
       return history || [];
     } catch (error) {
@@ -334,10 +385,10 @@ export class NearContractService {
       }
 
       console.log('💰 Fetching total profit from contract...');
-      const profit = '0'; // Demo value
+      const profit = await this.contract.get_total_profit({ user: accountId });
       console.log('✅ Fetched total profit:', profit);
       
-      // Convert from yoctoNEAR to NEAR
+      // Convert from yoctoNEAR to NEAR if needed
       return profit || '0';
     } catch (error) {
       console.error('❌ Error fetching total profit:', error);
@@ -360,13 +411,7 @@ export class NearContractService {
 
     try {
       console.log('ℹ️ Fetching contract info...');
-      const info = {
-        name: 'ArbitrageAI Cross-Chain Agent',
-        version: '1.0.0',
-        owner: this.getAccountId(),
-        total_intents: 0,
-        total_executions: 0
-      };
+      const info = await this.contract.get_contract_info();
       console.log('✅ Contract info:', info);
       return info;
     } catch (error) {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   DollarSign, 
   TrendingUp, 
@@ -8,7 +8,8 @@ import {
   Target,
   Plus,
   Zap,
-  AlertCircle
+  AlertCircle,
+  CheckCircle
 } from 'lucide-react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
@@ -27,6 +28,7 @@ export const DashboardPage: React.FC = () => {
   const [totalProfit, setTotalProfit] = useState('0');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [notification, setNotification] = useState<{type: 'success' | 'error', message: string} | null>(null);
 
   useEffect(() => {
     fetchDashboardData();
@@ -35,24 +37,45 @@ export const DashboardPage: React.FC = () => {
   const fetchDashboardData = async () => {
     try {
       setIsLoading(true);
+      console.log('📊 Fetching dashboard data...');
+      
       const [intentsData, executionsData, profitData] = await Promise.all([
         getIntents(),
         getExecutionHistory(),
         getTotalProfit()
       ]);
+      
       setIntents(intentsData);
       setExecutions(executionsData);
       setTotalProfit(profitData);
+      
+      console.log('✅ Dashboard data loaded:', {
+        intents: intentsData.length,
+        executions: executionsData.length,
+        profit: profitData
+      });
     } catch (error) {
-      console.error('Error fetching dashboard data:', error);
+      console.error('❌ Error fetching dashboard data:', error);
+      showNotification('error', 'Failed to load dashboard data');
     } finally {
       setIsLoading(false);
     }
   };
 
+  const showNotification = (type: 'success' | 'error', message: string) => {
+    setNotification({ type, message });
+    setTimeout(() => setNotification(null), 5000);
+  };
+
+  const handleCreateIntentSuccess = () => {
+    console.log('🎉 Intent created successfully, refreshing dashboard...');
+    fetchDashboardData();
+    showNotification('success', 'Intent created successfully!');
+  };
+
   const handleAIRecommendation = async (recommendation: any) => {
     try {
-      console.log('Executing AI recommendation:', recommendation);
+      console.log('🤖 Executing AI recommendation:', recommendation);
       
       // Find matching intent or create a temporary one
       const matchingIntent = intents.find(intent => 
@@ -72,13 +95,13 @@ export const DashboardPage: React.FC = () => {
         // Refresh dashboard data
         await fetchDashboardData();
         
-        alert(`AI-powered arbitrage executed successfully for ${recommendation.tokenPair}!`);
+        showNotification('success', `AI-powered arbitrage executed successfully for ${recommendation.tokenPair}!`);
       } else {
-        alert(`No active intent found for ${recommendation.tokenPair}. Please create an intent first.`);
+        showNotification('error', `No active intent found for ${recommendation.tokenPair}. Please create an intent first.`);
       }
-    } catch (error) {
-      console.error('Error executing AI recommendation:', error);
-      alert(`Failed to execute AI recommendation: ${error.message}`);
+    } catch (error: any) {
+      console.error('❌ Error executing AI recommendation:', error);
+      showNotification('error', `Failed to execute AI recommendation: ${error.message}`);
     }
   };
 
@@ -125,6 +148,31 @@ export const DashboardPage: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      {/* Notification */}
+      <AnimatePresence>
+        {notification && (
+          <motion.div
+            initial={{ opacity: 0, y: -50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -50 }}
+            className={`fixed top-4 right-4 z-50 p-4 rounded-lg border ${
+              notification.type === 'success' 
+                ? 'bg-green-500/10 border-green-500/20 text-green-400' 
+                : 'bg-red-500/10 border-red-500/20 text-red-400'
+            }`}
+          >
+            <div className="flex items-center space-x-2">
+              {notification.type === 'success' ? (
+                <CheckCircle className="w-5 h-5" />
+              ) : (
+                <AlertCircle className="w-5 h-5" />
+              )}
+              <span>{notification.message}</span>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -291,6 +339,14 @@ export const DashboardPage: React.FC = () => {
               <p className="text-sm text-gray-500 mt-1">
                 Create your first arbitrage intent to start trading
               </p>
+              <Button
+                onClick={() => setShowCreateModal(true)}
+                className="mt-4"
+                size="sm"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Create Intent
+              </Button>
             </div>
           ) : (
             <div className="space-y-3">
@@ -305,7 +361,7 @@ export const DashboardPage: React.FC = () => {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
                       <div className={`w-4 h-4 rounded-full ${
-                        intent.status === 'active' ? 'bg-green-500' : 
+                        intent.status === 'active' ? 'bg-green-500 animate-pulse' : 
                         intent.status === 'paused' ? 'bg-yellow-500' : 'bg-gray-500'
                       }`} />
                       <div>
@@ -334,15 +390,14 @@ export const DashboardPage: React.FC = () => {
       </div>
 
       {/* Create Intent Modal */}
-      {showCreateModal && (
-        <CreateIntentModal
-          onClose={() => setShowCreateModal(false)}
-          onSuccess={() => {
-            setShowCreateModal(false);
-            fetchDashboardData();
-          }}
-        />
-      )}
+      <AnimatePresence>
+        {showCreateModal && (
+          <CreateIntentModal
+            onClose={() => setShowCreateModal(false)}
+            onSuccess={handleCreateIntentSuccess}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 };
