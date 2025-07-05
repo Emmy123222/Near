@@ -14,8 +14,8 @@ import { useWallet } from './contexts/WalletContext';
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 30000,
-      refetchInterval: 30000,
+      staleTime: 15000, // Reduced to 15 seconds for more frequent updates
+      refetchInterval: 15000, // Refetch every 15 seconds
     },
   },
 });
