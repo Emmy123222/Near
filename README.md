@@ -6,80 +6,271 @@
   <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React" />
   <img src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
   <img src="https://img.shields.io/badge/Rust-000000?style=for-the-badge&logo=rust&logoColor=white" alt="Rust" />
+  <img src="https://img.shields.io/badge/AI-Groq-FF6B6B?style=for-the-badge&logo=openai&logoColor=white" alt="AI Powered" />
 </div>
 
-## 🌟 Overview
+## 🌟 Project Overview
 
-**ArbitrageAI** is a production-ready, AI-powered cross-chain arbitrage agent that automatically detects and executes profitable trading opportunities between NEAR Protocol and Ethereum networks. Built with a stunning space-themed UI and powered by real-time price feeds, this application represents the future of decentralized finance automation.
+**ArbitrageAI** is a revolutionary, production-ready AI-powered cross-chain arbitrage agent that automatically detects and executes profitable trading opportunities between NEAR Protocol and Ethereum networks. Built with cutting-edge technology and featuring a stunning space-themed UI, this application represents the future of decentralized finance automation.
 
-### 🎯 What This Project Does
+### 🎯 What ArbitrageAI Does
 
-1. **🤖 AI-Powered Detection**: Continuously monitors price differences across NEAR and Ethereum DEXs using advanced algorithms
-2. **⚡ Automated Execution**: Executes profitable trades automatically when opportunities exceed user-defined thresholds
-3. **🔗 Cross-Chain Integration**: Seamlessly operates across multiple blockchain networks with secure signature verification
-4. **📊 Real-Time Analytics**: Provides comprehensive dashboards with live performance metrics and trade history
-5. **🎨 Futuristic UI**: Features a space-themed interface with smooth animations and responsive design
+ArbitrageAI is an intelligent trading system that:
 
-## 🏗️ Architecture Overview
+1. **🤖 AI-Powered Market Analysis**: Uses Groq Cloud AI (Llama 3 8B model) to analyze market conditions every 30 seconds
+2. **⚡ Automated Arbitrage Detection**: Continuously monitors price differences across NEAR and Ethereum DEXs
+3. **🔗 Cross-Chain Execution**: Executes profitable trades automatically across multiple blockchain networks
+4. **📊 Real-Time Analytics**: Provides comprehensive dashboards with live performance metrics
+5. **🎨 Futuristic Interface**: Features a space-themed UI with smooth animations and responsive design
+6. **🛡️ Secure Operations**: Implements robust security measures and smart contract validation
+
+## 🏗️ System Architecture
+
+### High-Level Architecture Diagram
 
 ```mermaid
 graph TB
-    A[User Interface] --> B[NEAR Wallet]
-    A --> C[Price Monitor]
-    A --> D[Smart Contract Interface]
-    C --> D[CoinGecko API]
-    C --> E[NEAR DEX]
-    C --> F[Ethereum DEX]
-    D --> G[NEAR Smart Contract]
-    B --> G[NEAR Smart Contract]
-    G --> H[Intent Manager]
-    G --> I[Arbitrage Executor]
-    G --> J[Cross-Chain Verifier]
-    G --> K[AI Integration Layer]
-    I --> K[Trade Execution]
-    K --> L[On-Chain Logging]
-    K --> M[Groq AI Analysis]
+    subgraph "Frontend Layer"
+        A[React App] --> B[Wallet Integration]
+        A --> C[AI Analysis Panel]
+        A --> D[Dashboard]
+        A --> E[Intent Manager]
+    end
+    
+    subgraph "AI Layer"
+        F[Groq Cloud AI] --> G[Market Analysis]
+        F --> H[Opportunity Detection]
+        F --> I[Risk Assessment]
+        F --> J[Trade Validation]
+    end
+    
+    subgraph "Blockchain Layer"
+        K[NEAR Protocol] --> L[Smart Contract]
+        M[Ethereum Network] --> N[DEX Integration]
+    end
+    
+    subgraph "Data Layer"
+        O[CoinGecko API] --> P[Price Feeds]
+        Q[Real-time Monitoring] --> R[Market Data]
+    end
+    
+    A --> F
+    A --> K
+    A --> O
+    L --> S[Intent Storage]
+    L --> T[Execution History]
+    L --> U[Profit Tracking]
 ```
 
-### 🧠 Core Components
+### 🧠 Core Components Breakdown
 
-#### 1. **Smart Contract Layer (NEAR Protocol)**
-- **Intent Manager**: Stores user-defined trading strategies on-chain
-- **Arbitrage Executor**: Handles trade execution and profit calculation
-- **Cross-Chain Verifier**: Validates signatures from other networks
-- **Event Logger**: Records all transactions for audit trails
-- **AI Integration**: Validates trades with Groq AI before execution
-
-#### 2. **AI Detection Engine**
-- **Groq Cloud AI Integration**: Powered by Llama 3 8B model for advanced market analysis
-- **Real-time Market Analysis**: AI analyzes price patterns, volume, and market sentiment
-- **Intelligent Opportunity Detection**: Machine learning identifies profitable arbitrage opportunities
-- **Risk Assessment**: AI evaluates gas fees, slippage, and market volatility before execution
-- **Predictive Analytics**: Price movement prediction and optimal timing recommendations
-- **Adaptive Learning**: Continuously improves recommendations based on market conditions
-- **Smart Contract Validation**: AI approves or rejects trades before on-chain execution
-
-#### 3. **Frontend Application**
-- **Dashboard**: Real-time performance analytics and active intents
+#### 1. **Frontend Application (React + TypeScript)**
+- **Dashboard**: Real-time performance analytics and market overview
 - **Intent Manager**: Create and manage automated trading strategies
-- **History**: Complete transaction history with detailed analytics
-- **Settings**: Customize trading parameters and notifications
-- **Contract Status**: Live smart contract connection and health monitoring
+- **History Page**: Complete transaction history with detailed analytics
+- **Settings Page**: Customize trading parameters and security settings
+- **AI Analysis Panel**: Live AI market analysis and recommendations
 
-## 🚀 Quick Start
+#### 2. **AI Intelligence Engine (Groq Cloud)**
+- **Market Analysis**: Real-time analysis of market conditions using Llama 3 8B model
+- **Opportunity Detection**: AI identifies profitable arbitrage opportunities
+- **Risk Assessment**: Evaluates gas fees, slippage, and market volatility
+- **Predictive Analytics**: Price movement prediction and optimal timing
+- **Trade Validation**: AI approves or rejects trades before execution
+- **Continuous Learning**: Adapts to market conditions and improves over time
+
+#### 3. **Smart Contract Layer (NEAR Protocol)**
+- **Intent Management**: Stores user-defined trading strategies on-chain
+- **Arbitrage Execution**: Handles trade execution and profit calculation
+- **Cross-Chain Verification**: Validates signatures from other networks
+- **Event Logging**: Records all transactions for audit trails
+- **Security Controls**: Access control and permission management
+
+#### 4. **Cross-Chain Integration**
+- **NEAR DEX Integration**: Connects to NEAR-based decentralized exchanges
+- **Ethereum DEX Support**: Interfaces with Ethereum DEX protocols
+- **Bridge Protocols**: Secure cross-chain asset transfers
+- **Signature Verification**: Multi-network transaction validation
+
+## 🚀 Key Features Deep Dive
+
+### 🧠 **Revolutionary AI Integration**
+
+#### **Groq Cloud AI (Llama 3 8B Model)**
+- **Real-time Analysis**: Market analysis every 30 seconds
+- **Natural Language Processing**: Human-readable explanations for all decisions
+- **Confidence Scoring**: Transparent confidence levels (0-100%) for all recommendations
+- **Risk Assessment**: Multi-factor risk analysis including gas fees, slippage, volatility
+- **Predictive Analytics**: Price movement predictions with confidence intervals
+- **Adaptive Learning**: Continuously improves based on market patterns
+
+#### **AI Analysis Features**
+```typescript
+// Example AI Analysis Output
+{
+  recommendation: "BUY",
+  confidence: 87,
+  reasoning: "Strong arbitrage opportunity detected with 2.3% profit potential. Low network congestion and optimal liquidity conditions.",
+  riskLevel: "LOW",
+  profitPotential: 23,
+  timeframe: "immediate",
+  marketSentiment: "BULLISH"
+}
+```
+
+### 🎯 **Intelligent Arbitrage System**
+
+#### **Intent-Based Trading**
+Users create "intents" that define their trading strategies:
+- **Token Pairs**: Choose from 8+ major cryptocurrency pairs
+- **Profit Thresholds**: Set minimum profit percentages (0.1% - 50%)
+- **Risk Parameters**: Configure maximum slippage and gas fees
+- **AI Validation**: Each intent validated by AI before creation
+- **Status Management**: Pause, resume, or modify intents anytime
+
+#### **Automated Execution Pipeline**
+1. **Market Monitoring**: Continuous price feed analysis
+2. **AI Validation**: Opportunity assessment with confidence scoring
+3. **Risk Evaluation**: Gas cost vs profit analysis
+4. **Smart Contract Execution**: On-chain trade execution
+5. **Result Logging**: Permanent record on NEAR blockchain
+
+### 📊 **Real-Time Dashboard**
+
+#### **Performance Metrics**
+- **Total Profit**: Cumulative earnings from all trades
+- **Active Intents**: Number of monitoring strategies
+- **Success Rate**: Percentage of profitable trades
+- **Live Opportunities**: AI-detected arbitrage chances
+
+#### **AI Analysis Panel**
+- **Market Analysis**: Overall market sentiment and recommendations
+- **Opportunity Detection**: Real-time arbitrage opportunities
+- **Risk Assessment**: Current market risk factors
+- **Predictive Insights**: AI-powered market predictions
+
+### 🔐 **Security & Safety**
+
+#### **Smart Contract Security**
+```rust
+// Example security implementation
+assert_eq!(intent.user, user, "Only intent owner can execute");
+assert!(deposit >= 1_000_000_000_000_000_000_000_000, "Minimum 1 NEAR deposit required");
+assert!(profit_percentage >= min_threshold, "Profit below threshold");
+```
+
+#### **AI Safety Measures**
+- **Confidence Thresholds**: Only execute trades with >70% AI confidence
+- **Risk Limits**: Automatic rejection of high-risk opportunities
+- **Gas Optimization**: AI calculates optimal gas strategies
+- **Slippage Protection**: Built-in slippage tolerance controls
+
+## 🛠️ Technology Stack
+
+### **Blockchain & Smart Contracts**
+- **NEAR Protocol**: Primary blockchain for contract deployment
+- **Rust**: Smart contract development language with memory safety
+- **NEAR SDK**: Contract development framework with built-in features
+- **NEAR API JS**: Frontend blockchain integration library
+- **Cross-Chain Signatures**: Multi-network transaction support
+
+### **AI & Machine Learning**
+- **Groq Cloud**: High-performance AI inference platform
+- **Llama 3 8B Model**: Advanced language model for market analysis
+- **Real-time Processing**: Sub-second AI response times
+- **Natural Language Generation**: Human-readable AI explanations
+
+### **Frontend Development**
+- **React 18**: Modern UI framework with concurrent features
+- **TypeScript**: Type-safe development with enhanced IDE support
+- **Vite**: Lightning-fast build tool and development server
+- **Tailwind CSS**: Utility-first styling framework
+
+### **UI/UX & Animations**
+- **Framer Motion**: Smooth animations and micro-interactions
+- **Lucide React**: Beautiful, consistent icon library
+- **Responsive Design**: Mobile-first approach with breakpoints
+- **Space Theme**: Futuristic design with animated backgrounds
+
+### **Data & APIs**
+- **TanStack Query**: Advanced data fetching and caching
+- **CoinGecko API**: Real-time cryptocurrency price feeds
+- **Axios**: HTTP client with request/response interceptors
+- **WebSocket Support**: Real-time data streaming
+
+### **Wallet Integration**
+- **NEAR Wallet Selector**: Multi-wallet support (HERE, Meteor, MyNEAR)
+- **Wallet Connection**: Seamless wallet integration
+- **Transaction Signing**: Secure transaction authorization
+
+## 📋 Project Structure
+
+```
+arbitrage-ai/
+├── 📁 src/
+│   ├── 📁 components/           # Reusable UI components
+│   │   ├── 📁 ui/              # Base UI components (Button, Card, etc.)
+│   │   ├── 📄 AIAnalysisPanel.tsx      # AI analysis and recommendations
+│   │   ├── 📄 ContractStatus.tsx       # Smart contract connection status
+│   │   ├── 📄 CreateIntentModal.tsx    # Intent creation interface
+│   │   ├── 📄 Dashboard.tsx            # Performance analytics
+│   │   ├── 📄 IntentManager.tsx        # Strategy management
+│   │   ├── 📄 Navigation.tsx           # App navigation
+│   │   ├── 📄 PriceChart.tsx           # Price visualization
+│   │   ├── 📄 PriceMonitor.tsx         # Real-time price tracking
+│   │   └── 📄 WalletConnection.tsx     # Wallet integration
+│   ├── 📁 contexts/            # React contexts for state management
+│   │   └── 📄 WalletContext.tsx        # Wallet state management
+│   ├── 📁 hooks/               # Custom React hooks
+│   │   ├── 📄 useGroqAI.ts             # AI integration hook
+│   │   ├── 📄 useNear.ts               # NEAR contract integration
+│   │   └── 📄 usePriceFeeds.ts         # Price data management
+│   ├── 📁 pages/               # Application pages
+│   │   ├── 📄 DashboardPage.tsx        # Main dashboard
+│   │   ├── 📄 HistoryPage.tsx          # Transaction history
+│   │   ├── 📄 LandingPage.tsx          # Welcome page
+│   │   └── 📄 SettingsPage.tsx         # User settings
+│   ├── 📁 utils/               # Utility functions
+│   │   ├── 📄 groqAI.ts                # AI service integration
+│   │   ├── 📄 nearContract.ts          # Smart contract interface
+│   │   ├── 📄 near.ts                  # NEAR protocol utilities
+│   │   └── 📄 priceFeeds.ts            # Price feed management
+│   ├── 📄 App.tsx              # Main application component
+│   └── 📄 main.tsx             # Application entry point
+├── 📁 contract/                # NEAR smart contract
+│   ├── 📄 src/lib.rs           # Main contract code
+│   ├── 📄 Cargo.toml           # Rust dependencies
+│   └── 📄 build.sh             # Contract build script
+├── 📁 public/                  # Static assets
+├── 📄 package.json             # Node.js dependencies
+├── 📄 vite.config.ts           # Vite configuration
+├── 📄 tailwind.config.js       # Tailwind CSS configuration
+├── 📄 deploy.sh                # Deployment script
+├── 📄 DEPLOYMENT.md            # Deployment guide
+├── 📄 SECURITY.md              # Security guidelines
+└── 📄 README.md                # This file
+```
+
+## 🚀 Quick Start Guide
 
 ### Prerequisites
 
-- Node.js 18+ and npm
-- NEAR CLI (`npm install -g near-cli`)
-- Git
-- NEAR Testnet Account with some testnet NEAR tokens
+Before you begin, ensure you have:
+
+- **Node.js 18+** and npm installed
+- **NEAR CLI** (`npm install -g near-cli`)
+- **Git** for version control
+- **NEAR Testnet Account** with testnet NEAR tokens
+- **Groq API Key** (free at [console.groq.com](https://console.groq.com/))
 
 ### 1. Clone and Install
 
 ```bash
+# Clone the repository
 git clone <repository-url>
-cd cross-chain-arbitrage-agent
+cd arbitrage-ai
+
+# Install dependencies
 npm install
 ```
 
@@ -89,7 +280,7 @@ Create a `.env.local` file in the project root:
 
 ```env
 # NEAR Protocol Configuration
-VITE_NEAR_CONTRACT_ID=arbitrage-ai.testnet
+VITE_NEAR_CONTRACT_ID=your-deployed-contract.testnet
 VITE_NEAR_NETWORK_ID=testnet
 VITE_NEAR_NODE_URL=https://rpc.testnet.near.org
 VITE_NEAR_WALLET_URL=https://wallet.testnet.near.org
@@ -97,37 +288,32 @@ VITE_NEAR_HELPER_URL=https://helper.testnet.near.org
 VITE_NEAR_EXPLORER_URL=https://explorer.testnet.near.org
 
 # AI Configuration (Required for AI features)
-VITE_GROQ_API_KEY=your-groq-api-key
+VITE_GROQ_API_KEY=your-groq-api-key-here
 ```
 
-**Important Security Notes:**
-- Never commit your `.env.local` file to version control
-- Keep your API keys secure and rotate them regularly
-- Use different API keys for development and production
-- The `.env.local` file is already included in `.gitignore`
-
-**Getting a Groq API Key:**
+**🔑 Getting a Groq API Key:**
 1. Visit [Groq Cloud Console](https://console.groq.com/)
-2. Sign up for a free account
+2. Sign up for a free account (no credit card required)
 3. Navigate to API Keys section
 4. Create a new API key
 5. Copy the key to your `.env.local` file
-### 3. Deploy NEAR Contract
+
+**⚠️ Security Notes:**
+- Never commit your `.env.local` file to version control
+- Keep your API keys secure and rotate them regularly
+- The `.env.local` file is already included in `.gitignore`
+
+### 3. Deploy NEAR Contract (Optional)
 
 ```bash
 # Make deployment script executable
 chmod +x deploy.sh
 
-# Run deployment
+# Run deployment (requires NEAR CLI setup)
 ./deploy.sh
 ```
 
-The script will:
-- Create a new NEAR testnet account
-- Deploy the smart contract
-- Initialize the contract with your account
-- Update environment variables automatically
-- Test contract functionality
+**Note**: The app works in demo mode without a deployed contract, perfect for testing and development.
 
 ### 4. Start Development Server
 
@@ -137,306 +323,586 @@ npm run dev
 
 Visit `http://localhost:5173` to see the application.
 
-## 📋 How It Works
+## 📖 How It Works
 
-### 1. **Intent Creation**
-Users define their trading strategies by:
-- Selecting token pairs (ETH/USDC, BTC/USDC, etc.)
-- Setting minimum profit thresholds
-- Configuring risk parameters
-- Getting AI validation before submission
-- Submitting intents to the NEAR smart contract
+### 1. **User Journey**
 
-### 2. **Price Monitoring**
-The system continuously:
-- Fetches real-time prices from CoinGecko API
-- Analyzes market data using Groq Cloud AI (Llama 3 8B model)
-- Detects cross-chain price discrepancies with AI validation
-- Provides intelligent recommendations with confidence scores
-- Predicts price movements and optimal execution timing
-- Validates opportunities against user intents on-chain
+#### **Step 1: Connect Wallet**
+- Users connect their NEAR wallet (HERE, Meteor, or MyNEAR)
+- Wallet integration handles authentication and transaction signing
+- App automatically redirects to dashboard after connection
 
-### 3. **Arbitrage Execution**
-When opportunities are detected:
-- Groq AI analyzes the opportunity with advanced algorithms
-- Validates profit potential, risk factors, and market conditions
-- Provides detailed reasoning and confidence scores
-- Smart contract verifies user permissions and intent parameters
-- Cross-chain signatures are generated and verified
-- Trades are executed only with AI approval and high confidence
-- All results are permanently recorded on NEAR blockchain
-- Results are logged on-chain for transparency
+#### **Step 2: Create Trading Intent**
+```typescript
+// Example intent creation
+const intent = {
+  tokenPair: 'ETH/USDC',
+  minProfitThreshold: '1.5', // 1.5% minimum profit
+  status: 'active'
+};
+```
 
-### 4. **Profit Tracking**
-All activities are recorded:
-- On-chain storage of all trade data
-- Trade execution details
-- Profit/loss calculations
-- Gas fee tracking
-- Performance analytics
-- Immutable audit trail on NEAR blockchain
+#### **Step 3: AI Validation**
+- AI analyzes the intent parameters
+- Provides confidence score and risk assessment
+- Offers recommendations for optimization
 
-## 🛠️ Technology Stack
+#### **Step 4: Automated Monitoring**
+- System monitors market conditions every 30 seconds
+- AI continuously analyzes arbitrage opportunities
+- Real-time updates displayed in dashboard
 
-### **Blockchain & Smart Contracts**
-- **NEAR Protocol**: Primary blockchain for contract deployment
-- **Rust**: Smart contract development language
-- **NEAR SDK**: Contract development framework
-- **NEAR API JS**: Frontend blockchain integration
-- **Cross-Chain Signatures**: Multi-network transaction support
+#### **Step 5: Trade Execution**
+- When profitable opportunity detected:
+  - AI validates the trade (>70% confidence required)
+  - Smart contract executes the arbitrage
+  - Results recorded on NEAR blockchain
+  - User receives profit automatically
 
-### **Frontend Development**
-- **React 18**: Modern UI framework
-- **TypeScript**: Type-safe development
-- **Vite**: Fast build tool and dev server
-- **Tailwind CSS**: Utility-first styling
+### 2. **AI Analysis Workflow**
 
-### **UI/UX & Animations**
-- **Framer Motion**: Smooth animations and transitions
-- **Lucide React**: Beautiful icon library
-- **Responsive Design**: Mobile-first approach
+```mermaid
+graph LR
+    A[Market Data] --> B[AI Analysis]
+    B --> C[Confidence Score]
+    B --> D[Risk Assessment]
+    B --> E[Profit Prediction]
+    C --> F{Confidence > 70%?}
+    F -->|Yes| G[Execute Trade]
+    F -->|No| H[Wait for Better Opportunity]
+    G --> I[Record Results]
+```
 
-### **Data & APIs**
-- **TanStack Query**: Data fetching and caching
-- **CoinGecko API**: Real-time cryptocurrency prices
-- **Groq Cloud AI**: Advanced market analysis and predictions
-- **Llama 3 8B Model**: Natural language processing for market insights
-- **Axios**: HTTP client for API requests
+### 3. **Smart Contract Operations**
 
-### **Wallet Integration**
-- **NEAR Wallet Selector**: Seamless wallet connection
-- **NEAR API JS**: Direct contract interaction
-- **Cross-Chain Signatures**: Multi-network transaction support
+#### **Intent Storage**
+```rust
+pub struct ArbitrageIntent {
+    pub id: String,
+    pub user: AccountId,
+    pub token_pair: String,
+    pub min_profit_threshold: f64,
+    pub status: IntentStatus,
+    pub created_at: U64,
+}
+```
 
-## 📊 Features Deep Dive
+#### **Execution Tracking**
+```rust
+pub struct ArbitrageExecution {
+    pub id: String,
+    pub intent_id: String,
+    pub user: AccountId,
+    pub token_pair: String,
+    pub price_diff: f64,
+    pub profit: f64,
+    pub gas_fees: f64,
+    pub tx_hash: String,
+    pub timestamp: U64,
+}
+```
 
-### 🧠 **AI-Powered Analysis**
-Revolutionary AI integration with:
-- **Market Sentiment Analysis**: Real-time analysis of market conditions and trends
-- **Intelligent Risk Assessment**: AI evaluates multiple risk factors before trade execution
-- **Predictive Analytics**: Price movement predictions with confidence intervals
-- **Adaptive Recommendations**: Learning from market patterns and user preferences
-- **Natural Language Insights**: Human-readable explanations for all AI decisions
-- **Confidence Scoring**: Transparent confidence levels for all AI recommendations
-- **Smart Contract Integration**: AI validates trades before on-chain execution
+## 🎯 Features in Detail
 
-### 🎯 **Arbitrage Intents**
-Create sophisticated trading strategies with:
-- **Token Pair Selection**: Choose from major cryptocurrency pairs
-- **Profit Thresholds**: Set minimum profit percentages (0.5% - 50%)
-- **Risk Management**: Configure maximum slippage and gas fees
-- **Status Management**: Pause, resume, or modify intents anytime
-- **On-Chain Storage**: All intents stored permanently on NEAR blockchain
-- **AI Validation**: Each intent validated by AI before creation
+### 🤖 **AI-Powered Analysis**
 
-### 📈 **Real-Time Dashboard**
-Monitor your performance with:
-- **Contract Status**: Live connection status and contract health
-- **AI Analysis Panel**: Comprehensive market analysis with AI insights
-- **AI-Detected Opportunities**: Machine learning identified arbitrage chances
-- **Predictive Indicators**: AI-powered price movement predictions
+#### **Market Sentiment Analysis**
+- Real-time analysis of market conditions and trends
+- Sentiment scoring: BULLISH, BEARISH, or NEUTRAL
+- Volatility index calculation (0-100 scale)
+- Market momentum indicators
 
-### 🔍 **Trade History**
-Complete transparency with:
-- **Blockchain Verification**: All data verified on NEAR blockchain
-- **Detailed Transaction Logs**: Every trade recorded on-chain
+#### **Intelligent Risk Assessment**
+- Multi-factor risk analysis including:
+  - Gas fee impact on profitability
+  - Market volatility and liquidity
+  - Slippage tolerance calculations
+  - Network congestion effects
+
+#### **Predictive Analytics**
+- Price movement predictions with confidence intervals
+- Optimal timing recommendations for trade execution
+- Market trend analysis and pattern recognition
+- Adaptive learning from historical performance
+
+### 📊 **Real-Time Dashboard**
+
+#### **Performance Metrics**
+- **Total Profit**: Cumulative earnings with percentage growth
+- **Active Intents**: Number of monitoring strategies
+- **Success Rate**: Percentage of profitable trades
+- **Live Opportunities**: Current arbitrage chances
+
+#### **AI Analysis Panel**
+- **Market Analysis**: Overall market sentiment and recommendations
+- **Opportunity Detection**: Real-time arbitrage opportunities with priority levels
+- **Risk Factors**: Current market risks and mitigation strategies
+- **Predictive Insights**: AI-powered market predictions
+
+#### **Live Price Monitoring**
+- Real-time price feeds from CoinGecko API
+- Cross-chain price comparison
+- Historical price charts with technical indicators
+- Volume and liquidity analysis
+
+### 🎯 **Intent Management System**
+
+#### **Intent Creation**
+- **Token Pair Selection**: Choose from 8+ major pairs (ETH/USDC, BTC/USDC, etc.)
+- **Profit Thresholds**: Set minimum profit percentages (0.1% - 50%)
+- **Risk Parameters**: Configure slippage tolerance and gas limits
+- **AI Validation**: Pre-creation analysis and recommendations
+
+#### **Intent Lifecycle**
+1. **Creation**: User defines strategy parameters
+2. **Validation**: AI analyzes and provides feedback
+3. **Activation**: Intent stored on NEAR blockchain
+4. **Monitoring**: Continuous market surveillance
+5. **Execution**: Automated trade when conditions met
+6. **Completion**: Results recorded and profits distributed
+
+### 📈 **Transaction History**
+
+#### **Comprehensive Tracking**
+- **Execution Details**: Complete trade information
 - **Profit Analysis**: Breakdown of gains and fees
-- **Block Explorer Links**: Verify transactions independently
-- **Export Capabilities**: Download data for tax reporting
-- **Immutable Records**: Permanent audit trail on blockchain
+- **Performance Metrics**: Success rates and trends
+- **Blockchain Verification**: Links to NEAR Explorer
+- **Export Capabilities**: Download data for analysis
 
-### ⚙️ **Advanced Settings**
-Customize your experience:
-- **Notification Preferences**: Email, Telegram, or browser alerts
-- **Trading Parameters**: Auto-trading toggles and limits
-- **Security Settings**: Session timeouts and confirmations
-- **Data Management**: Clear history and reset preferences
-- **Contract Management**: View and manage smart contract interactions
+#### **Advanced Filtering**
+- Filter by token pair, date range, or profit amount
+- Search by transaction hash or intent ID
+- Sort by various metrics (profit, date, success rate)
+- Export filtered results to CSV
 
-## 🔐 Security Features
+### ⚙️ **Settings & Customization**
 
-### **On-Chain Security**
-- **Smart Contract Validation**: All operations validated by NEAR smart contract
-- **Signature Verification**: All cross-chain transactions verified
-- **AI Validation**: Additional security layer through AI risk assessment
-- **Access Control**: Users can only modify their own intents
-- **Immutable Audit Trail**: Complete transaction history on blockchain
-- **Audit Trail**: Complete transaction history on blockchain
-- **Gas Optimization**: Efficient contract design minimizes fees
-- **Smart Execution**: AI prevents execution of high-risk trades
-- **Permission System**: Granular permissions for contract interactions
+#### **Trading Preferences**
+- **Auto-Trading**: Enable/disable automated execution
+- **Risk Tolerance**: Set maximum acceptable risk levels
+- **Gas Optimization**: Configure gas price strategies
+- **Notification Settings**: Email, Telegram, or browser alerts
+
+#### **Security Settings**
+- **Transaction Confirmation**: Require manual approval for trades
+- **Session Management**: Configure timeout periods
+- **Access Control**: Manage wallet permissions
+- **Audit Logging**: Track all account activities
+
+## 🔐 Security & Safety
+
+### **Smart Contract Security**
+
+#### **Access Control**
+```rust
+// Only intent owner can modify
+assert_eq!(intent.user, user, "Only intent owner can pause");
+
+// Minimum deposit requirements
+assert!(deposit >= 1_000_000_000_000_000_000_000_000, "Minimum 1 NEAR deposit required");
+
+// Profit threshold validation
+assert!(profit_percentage >= min_threshold, "Profit below threshold");
+```
+
+#### **Input Validation**
+- All user inputs sanitized and validated
+- Numeric ranges enforced (profit thresholds, gas limits)
+- Token pair validation against supported list
+- Deposit amount verification
+
+#### **Gas Optimization**
+```rust
+const GAS_FOR_CROSS_CHAIN_CALL: Gas = Gas::from_tgas(100);
+const GAS_FOR_DEX_SWAP: Gas = Gas::from_tgas(150);
+```
+
+### **AI Safety Measures**
+
+#### **Confidence Thresholds**
+- Only execute trades with >70% AI confidence
+- Risk assessment for all opportunities
+- Automatic rejection of high-risk trades
+- Continuous monitoring of AI performance
+
+#### **Risk Management**
+- Maximum slippage protection (configurable)
+- Gas fee impact analysis
+- Market volatility assessment
+- Liquidity depth verification
 
 ### **Frontend Security**
-- **Wallet Integration**: Secure NEAR wallet connection
-- **Contract Interface**: Type-safe smart contract interactions
-- **Input Validation**: All user inputs sanitized and validated
-- **Error Handling**: Comprehensive error boundaries
-- **Rate Limiting**: API calls throttled to prevent abuse
-- **Transaction Verification**: All transactions verified before execution
+
+#### **Wallet Integration**
+- Secure NEAR wallet connection protocols
+- Transaction signing with user approval
+- Private key never exposed to application
+- Session management with automatic timeouts
+
+#### **API Security**
+- Rate limiting for external API calls
+- Error handling with graceful degradation
+- Input sanitization for all user data
+- Secure environment variable management
 
 ## 🚀 Deployment Guide
 
+### **Local Development**
+
+```bash
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
+```
+
 ### **NEAR Testnet Deployment**
 
+#### **Prerequisites**
 1. **Install NEAR CLI**:
-```bash
-npm install -g near-cli
-```
+   ```bash
+   npm install -g near-cli
+   ```
 
 2. **Login to NEAR**:
-```bash
-near login
-```
+   ```bash
+   near login
+   ```
 
-3. **Run Deployment Script**:
+3. **Fund Your Account**: Get testnet NEAR from [NEAR Faucet](https://near-faucet.io/)
+
+#### **Deploy Contract**
 ```bash
+# Run automated deployment
 ./deploy.sh
 ```
 
-4. **Verify Deployment**:
-Visit the NEAR Explorer link provided after deployment.
+The script will:
+- Create a new NEAR testnet account for the contract
+- Deploy the smart contract
+- Initialize the contract with your account as owner
+- Update environment variables automatically
+- Test contract functionality
 
-5. **Test Contract Functions**:
+#### **Manual Deployment**
 ```bash
-# Test intent creation
-near call YOUR_CONTRACT.testnet create_intent \
-  '{"token_pair": "ETH/USDC", "min_profit_threshold": "1.0"}' \
-  --accountId your-account.testnet \
-  --deposit 1
+# Create contract account
+CONTRACT_NAME="arbitrage-ai-$(date +%s).testnet"
+near create-account $CONTRACT_NAME --masterAccount your-account.testnet --initialBalance 10
 
-# View user intents
-near view YOUR_CONTRACT.testnet get_user_intents \
-  '{"user": "your-account.testnet"}'
+# Build contract (if Rust is available)
+cd contract
+cargo build --target wasm32-unknown-unknown --release
+cd ..
+
+# Deploy contract
+near deploy --contractName $CONTRACT_NAME --wasmFile contract/target/wasm32-unknown-unknown/release/arbitrage_contract.wasm
+
+# Initialize contract
+near call $CONTRACT_NAME new '{"owner": "your-account.testnet"}' --accountId $CONTRACT_NAME
 ```
 
 ### **Frontend Deployment**
 
 #### **Vercel (Recommended)**
 ```bash
+# Install Vercel CLI
 npm install -g vercel
+
+# Deploy to Vercel
 vercel --prod
 ```
 
 #### **Netlify**
 ```bash
+# Build the project
 npm run build
+
 # Upload dist/ folder to Netlify
+# Or connect GitHub repository for automatic deployments
+```
+
+#### **Environment Variables for Production**
+```env
+VITE_NEAR_CONTRACT_ID=your-deployed-contract.testnet
+VITE_NEAR_NETWORK_ID=testnet
+VITE_GROQ_API_KEY=your-production-groq-key
 ```
 
 ## 📱 Mobile Experience
 
 The application is fully responsive and optimized for:
-- **iOS Safari**: Native-like performance and gestures
-- **Android Chrome**: Smooth scrolling and touch interactions
+
+- **iOS Safari**: Native-like performance with smooth gestures
+- **Android Chrome**: Optimized touch interactions and scrolling
 - **Progressive Web App**: Installable on mobile devices
 - **Offline Capabilities**: Core features work without internet
 - **Mobile Wallet**: Seamless NEAR wallet integration on mobile
 
+### **Mobile-Specific Features**
+- Touch-optimized interface elements
+- Swipe gestures for navigation
+- Mobile-friendly modals and forms
+- Responsive charts and visualizations
+- Optimized loading states
+
 ## 🔧 Development
 
-### **Project Structure**
-```
-src/
-├── components/          # Reusable UI components
-│   ├── ui/             # Base UI components
-│   ├── Dashboard.tsx   # Performance analytics
-│   ├── IntentManager.tsx # Strategy management
-│   └── ContractStatus.tsx # Smart contract status
-│   └── PriceMonitor.tsx # Real-time price tracking
-├── pages/              # Application pages
-├── hooks/              # Custom React hooks
-│   └── useNear.ts     # NEAR contract integration
-├── utils/              # Utility functions
-│   ├── nearContract.ts # Smart contract interface
-│   └── groqAI.ts      # AI integration
-├── contexts/           # React contexts
-└── contracts/          # Smart contract code
+### **Available Scripts**
+
+```bash
+npm run dev          # Start development server with hot reload
+npm run build        # Build for production with optimizations
+npm run preview      # Preview production build locally
+npm run lint         # Run ESLint for code quality
+npm run type-check   # TypeScript type checking
 ```
 
-### **Available Scripts**
-```bash
-npm run dev          # Start development server
-npm run build        # Build for production
-npm run preview      # Preview production build
-npm run lint         # Run ESLint
-npm run test         # Run tests
-npm run deploy       # Deploy to NEAR testnet
+### **Development Workflow**
+
+1. **Setup Environment**:
+   ```bash
+   cp .env.example .env.local
+   # Add your API keys and configuration
+   ```
+
+2. **Start Development**:
+   ```bash
+   npm run dev
+   ```
+
+3. **Code Quality**:
+   ```bash
+   npm run lint        # Check code quality
+   npm run type-check  # Verify TypeScript types
+   ```
+
+4. **Testing**:
+   ```bash
+   npm test           # Run unit tests
+   npm run test:e2e   # Run end-to-end tests
+   ```
+
+### **Code Organization**
+
+#### **Component Structure**
+```typescript
+// Example component structure
+interface ComponentProps {
+  data: MarketData[];
+  onAction: (action: string) => void;
+}
+
+export const Component: React.FC<ComponentProps> = ({ data, onAction }) => {
+  // Component logic
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="component-styles"
+    >
+      {/* Component content */}
+    </motion.div>
+  );
+};
+```
+
+#### **Hook Patterns**
+```typescript
+// Custom hook example
+export const useCustomHook = () => {
+  const [state, setState] = useState(initialState);
+  
+  const performAction = useCallback(async () => {
+    // Action logic
+  }, [dependencies]);
+  
+  return {
+    state,
+    performAction,
+    // Other hook returns
+  };
+};
 ```
 
 ### **Environment Variables**
+
+#### **Required Variables**
 ```env
-VITE_NEAR_CONTRACT_ID=    # Your deployed contract ID
-VITE_NEAR_NETWORK_ID=     # testnet or mainnet
-VITE_NEAR_NODE_URL=       # NEAR RPC endpoint
-VITE_NEAR_WALLET_URL=     # NEAR wallet URL
-VITE_NEAR_HELPER_URL=     # NEAR helper service
-VITE_NEAR_EXPLORER_URL=   # NEAR block explorer
-VITE_GROQ_API_KEY=       # Groq AI API key
+VITE_GROQ_API_KEY=           # Groq AI API key (required for AI features)
+```
+
+#### **Optional Variables**
+```env
+VITE_NEAR_CONTRACT_ID=       # Deployed contract ID (demo mode if not provided)
+VITE_NEAR_NETWORK_ID=        # testnet or mainnet (default: testnet)
+VITE_NEAR_NODE_URL=          # NEAR RPC endpoint
+VITE_NEAR_WALLET_URL=        # NEAR wallet URL
+VITE_NEAR_HELPER_URL=        # NEAR helper service
+VITE_NEAR_EXPLORER_URL=      # NEAR block explorer
 ```
 
 ## 🧪 Testing
 
-### **Smart Contract Tests**
-```bash
-cd contract
-cargo test
-```
+### **Testing Strategy**
 
-### **Frontend Tests**
+#### **Unit Tests**
+- Component testing with React Testing Library
+- Hook testing with custom test utilities
+- Utility function testing with Jest
+- Smart contract testing with NEAR SDK
+
+#### **Integration Tests**
+- API integration testing
+- Wallet connection testing
+- Smart contract interaction testing
+- AI service integration testing
+
+#### **End-to-End Tests**
+- Complete user journey testing
+- Cross-browser compatibility testing
+- Mobile responsiveness testing
+- Performance testing
+
+### **Running Tests**
+
 ```bash
+# Unit tests
 npm test
-```
 
-### **Integration Tests**
-```bash
+# Integration tests
 npm run test:integration
+
+# E2E tests
+npm run test:e2e
+
+# Coverage report
+npm run test:coverage
 ```
 
-### **Contract Integration Tests**
-```bash
-# Test contract deployment
-./deploy.sh
-
-# Test contract functions
-npm run test:contract
-```
 ## 📈 Performance Optimization
 
 ### **Frontend Optimizations**
-- **Code Splitting**: Lazy loading for optimal bundle sizes
-- **AI Response Caching**: Intelligent caching of AI analysis results
-- **Contract Call Optimization**: Batched contract interactions
-- **Image Optimization**: WebP format with fallbacks
-- **Caching Strategy**: Aggressive caching for static assets
-- **Bundle Analysis**: Regular bundle size monitoring
-- **AI Request Optimization**: Batched AI requests for efficiency
+
+#### **Code Splitting**
+- Lazy loading for optimal bundle sizes
+- Route-based code splitting
+- Component-level code splitting for large components
+
+#### **Caching Strategy**
+- AI response caching for 30 seconds
+- Price data caching with smart invalidation
+- Contract call result caching
+- Image optimization with WebP format
+
+#### **Bundle Optimization**
+- Tree shaking for unused code elimination
+- Dynamic imports for conditional features
+- Webpack bundle analysis and optimization
+
+### **AI Performance**
+
+#### **Request Optimization**
+- Batched AI requests for efficiency
+- Request deduplication for similar queries
+- Intelligent retry logic with exponential backoff
+- Response caching with TTL
+
+#### **Real-time Updates**
+- WebSocket connections for live data
+- Efficient state management with React Query
+- Optimistic updates for better UX
 
 ### **Blockchain Optimizations**
-- **Gas Efficiency**: Optimized contract methods
-- **Batch Operations**: Multiple operations in single transaction
-- **Batch Operations**: Multiple operations in single transaction
-- **State Management**: Efficient on-chain storage patterns
-- **Query Optimization**: Minimal RPC calls
-- **Smart Caching**: Cache contract state for better performance
+
+#### **Gas Efficiency**
+- Optimized smart contract methods
+- Batch operations for multiple transactions
+- Gas price optimization strategies
+
+#### **State Management**
+- Efficient on-chain storage patterns
+- Minimal RPC calls with smart caching
+- Query optimization for contract calls
 
 ## 🤝 Contributing
 
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+We welcome contributions! Here's how to get started:
 
-### **Development Workflow**
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests for new features
-5. Test smart contract integration
-5. Submit a pull request
+### **Development Setup**
 
-### **Code Standards**
-- TypeScript for type safety
-- ESLint for code quality
-- Prettier for formatting
-- Conventional commits
-- Smart contract testing required
+1. **Fork the Repository**
+2. **Clone Your Fork**:
+   ```bash
+   git clone https://github.com/your-username/arbitrage-ai.git
+   cd arbitrage-ai
+   ```
+
+3. **Create Feature Branch**:
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+
+4. **Install Dependencies**:
+   ```bash
+   npm install
+   ```
+
+5. **Set Up Environment**:
+   ```bash
+   cp .env.example .env.local
+   # Add your configuration
+   ```
+
+### **Development Guidelines**
+
+#### **Code Standards**
+- **TypeScript**: Use strict type checking
+- **ESLint**: Follow configured linting rules
+- **Prettier**: Use for consistent formatting
+- **Conventional Commits**: Use conventional commit messages
+
+#### **Component Guidelines**
+- Use functional components with hooks
+- Implement proper TypeScript interfaces
+- Add comprehensive error handling
+- Include loading and error states
+- Write unit tests for complex logic
+
+#### **Smart Contract Guidelines**
+- Follow Rust best practices
+- Implement comprehensive error handling
+- Add proper access controls
+- Write unit tests for all functions
+- Document all public methods
+
+### **Contribution Process**
+
+1. **Make Your Changes**
+2. **Add Tests**: Ensure new features have tests
+3. **Run Quality Checks**:
+   ```bash
+   npm run lint
+   npm run type-check
+   npm test
+   ```
+4. **Commit Changes**:
+   ```bash
+   git commit -m "feat: add new feature"
+   ```
+5. **Push to Fork**:
+   ```bash
+   git push origin feature/your-feature-name
+   ```
+6. **Create Pull Request**
 
 ## 📄 License
 
@@ -444,26 +910,50 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🙏 Acknowledgments
 
-- **NEAR Protocol** for blockchain infrastructure
-- **NEAR Foundation** for development tools and support
+- **NEAR Protocol** for blockchain infrastructure and development tools
+- **NEAR Foundation** for ecosystem support and documentation
 - **Groq** for AI cloud computing and Llama 3 model access
-- **CoinGecko** for price data APIs
-- **Framer Motion** for smooth animations
-- **Tailwind CSS** for utility-first styling
-- **React Community** for excellent tooling
+- **CoinGecko** for reliable cryptocurrency price data APIs
+- **Framer Motion** for smooth animations and micro-interactions
+- **Tailwind CSS** for utility-first styling framework
+- **React Community** for excellent tooling and ecosystem
+- **Open Source Community** for inspiration and contributions
 
-## 📞 Support
+## 📞 Support & Community
 
-- **Documentation**: [docs.arbitrageai.com](https://docs.arbitrageai.com)
-- **Discord**: [Join our community](https://discord.gg/arbitrageai)
-- **Twitter**: [@ArbitrageAI](https://twitter.com/arbitrageai)
+### **Documentation**
+- **Project Documentation**: This README and inline code comments
+- **API Documentation**: Available in `/docs` folder
+- **Smart Contract Docs**: Rust documentation in contract source
+
+### **Community**
+- **GitHub Issues**: Report bugs and request features
+- **GitHub Discussions**: Community discussions and Q&A
+- **Discord**: Real-time community chat (coming soon)
+- **Twitter**: Follow [@ArbitrageAI](https://twitter.com/arbitrageai) for updates
+
+### **Support Channels**
 - **Email**: support@arbitrageai.com
-- **NEAR Support**: [NEAR Discord](https://discord.gg/near)
+- **GitHub Issues**: Technical support and bug reports
+- **NEAR Support**: [NEAR Discord](https://discord.gg/near) for NEAR-specific issues
+
+### **Getting Help**
+
+1. **Check Documentation**: Start with this README and inline comments
+2. **Search Issues**: Look for existing solutions in GitHub issues
+3. **Create Issue**: If you can't find a solution, create a detailed issue
+4. **Community Discussion**: Use GitHub Discussions for general questions
 
 ---
 
 <div align="center">
-  <p>Built with ❤️ for the future of DeFi</p>
+  <p><strong>Built with ❤️ for the future of DeFi</strong></p>
   <p>🚀 Powered by NEAR Protocol & Groq AI</p>
   <p>⭐ Star this repo if you found it helpful!</p>
+  
+  <br>
+  
+  <img src="https://img.shields.io/github/stars/arbitrage-ai/arbitrage-ai?style=social" alt="GitHub stars" />
+  <img src="https://img.shields.io/github/forks/arbitrage-ai/arbitrage-ai?style=social" alt="GitHub forks" />
+  <img src="https://img.shields.io/github/watchers/arbitrage-ai/arbitrage-ai?style=social" alt="GitHub watchers" />
 </div>
