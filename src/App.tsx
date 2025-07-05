@@ -9,7 +9,7 @@ import { DashboardPage } from './pages/DashboardPage';
 import { HistoryPage } from './pages/HistoryPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { WalletProvider } from './contexts/WalletContext';
-import { useNear } from './hooks/useNear';
+import { useWallet } from './contexts/WalletContext';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -20,8 +20,8 @@ const queryClient = new QueryClient({
   },
 });
 
-function App() {
-  const { isSignedIn, isLoading } = useNear();
+function AppContent() {
+  const { isSignedIn, isLoading } = useWallet();
 
   if (isLoading) {
     return (
@@ -43,30 +43,36 @@ function App() {
   }
 
   return (
+    <div className="min-h-screen bg-gray-900 text-white">
+      <AnimatedBackground />
+      <div className="relative z-10">
+        {isSignedIn && <Navigation />}
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route
+            path="/dashboard"
+            element={isSignedIn ? <DashboardPage /> : <Navigate to="/" />}
+          />
+          <Route
+            path="/history"
+            element={isSignedIn ? <HistoryPage /> : <Navigate to="/" />}
+          />
+          <Route
+            path="/settings"
+            element={isSignedIn ? <SettingsPage /> : <Navigate to="/" />}
+          />
+          <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  return (
     <QueryClientProvider client={queryClient}>
       <WalletProvider>
-        <div className="min-h-screen bg-gray-900 text-white">
-          <AnimatedBackground />
-          <div className="relative z-10">
-            {isSignedIn && <Navigation />}
-            <Routes>
-              <Route path="/" element={<LandingPage />} />
-              <Route
-                path="/dashboard"
-                element={isSignedIn ? <DashboardPage /> : <Navigate to="/" />}
-              />
-              <Route
-                path="/history"
-                element={isSignedIn ? <HistoryPage /> : <Navigate to="/" />}
-              />
-              <Route
-                path="/settings"
-                element={isSignedIn ? <SettingsPage /> : <Navigate to="/" />}
-              />
-              <Route path="*" element={<Navigate to="/" />} />
-            </Routes>
-          </div>
-        </div>
+        <AppContent />
       </WalletProvider>
     </QueryClientProvider>
   );

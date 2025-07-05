@@ -27,25 +27,21 @@ export interface ArbitrageExecution {
 }
 
 export const useNear = () => {
-  const { isSignedIn, accountId, wallet } = useWallet();
+  const { isSignedIn, accountId, selector } = useWallet();
   const { getTradeRecommendation } = useGroqAI();
   const [isLoading, setIsLoading] = useState(true);
   const [contractInfo, setContractInfo] = useState<any>(null);
 
   useEffect(() => {
-    if (wallet) {
-      initializeContract();
-    }
-  }, [wallet]);
+    initializeContract();
+  }, [selector]);
 
   const initializeContract = async () => {
     try {
       setIsLoading(true);
       
-      // Only initialize if wallet is available
-      if (wallet) {
-        await nearContract.initialize();
-      }
+      // Initialize contract
+      await nearContract.initialize();
       
       // Fetch contract info
       const info = await nearContract.getContractInfo();

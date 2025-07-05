@@ -6,7 +6,7 @@ import { setupMeteorWallet } from '@near-wallet-selector/meteor-wallet';
 import { setupModal } from '@near-wallet-selector/modal-ui';
 import type { WalletSelector, AccountState } from '@near-wallet-selector/core';
 import { nearContract } from '../utils/nearContract';
-import { useNavigate } from 'react-router-dom'; // Import React Router's navigate
+import { useNavigate, useLocation } from 'react-router-dom';
 
 // Import wallet selector CSS
 import '@near-wallet-selector/modal-ui/styles.css';
@@ -17,7 +17,7 @@ interface WalletContextType {
   accounts: AccountState[];
   accountId: string | null;
   isSignedIn: boolean;
-  signIn: (walletId?: string) => void; // Updated to accept walletId
+  signIn: (walletId?: string) => void;
   signOut: () => void;
   isLoading: boolean;
   wallet: any;
@@ -38,7 +38,8 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [modal, setModal] = useState<any>(null);
   const [accounts, setAccounts] = useState<AccountState[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const navigate = useNavigate(); // React Router hook for navigation
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const init = async () => {
@@ -98,7 +99,10 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         // Check if signed in and redirect after successful connection
         if (state.accounts.length > 0 && state.accounts.some(account => account.active)) {
           console.log('✅ Wallet connected, redirecting to dashboard...');
-          navigate('/dashboard'); // Redirect to dashboard or desired page
+          // Only redirect if we're on the landing page
+          if (location.pathname === '/') {
+            navigate('/dashboard');
+          }
         }
       });
 
@@ -111,7 +115,7 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
 
     return () => subscription.unsubscribe();
-  }, [selector, navigate]);
+  }, [selector, navigate, location.pathname]);
 
   const signIn = (walletId?: string) => {
     if (!selector) {
@@ -123,12 +127,12 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     if (walletId === 'my-near-wallet') {
       // Directly trigger MyNearWallet sign-in with redirect
       selector.wallet('my-near-wallet').then(wallet => {
-              wallet.signIn({
-                contractId: nearContract.getContractId(),
-                successUrl: window.location.origin + '/dashboard', // Redirect after success
-                failureUrl: window.location.origin + '/login', // Redirect on failure
-              } as any); // Cast to any to avoid type error for browser wallet
-            }).catch(error => console.error('❌ Error signing in with MyNearWallet:', error));
+        wallet.signIn({
+          contractId: nearContract.getContractId(),
+          successUrl: window.location.origin + '/dashboard',
+          failureUrl: window.location.origin + '/',
+        } as any);
+      }).catch(error => console.error('❌ Error signing in with MyNearWallet:', error));
     } else {
       // Open modal for other wallets
       if (modal) {
@@ -149,6 +153,8 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     } catch (error) {
       console.error('❌ Error signing out:', error);
     } finally {
+      // Navigate to home page
+      navigate('/');
       // Force reload to clear state
       window.location.reload();
     }
