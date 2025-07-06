@@ -1,5 +1,6 @@
 import { connect, Contract, keyStores, WalletConnection, utils } from 'near-api-js';
 import { FunctionCallOptions } from 'near-api-js/lib/account';
+import { localStorageManager, StoredIntent, StoredExecution } from './localStorage';
 
 // NEAR configuration
 const nearConfig = {
@@ -84,6 +85,14 @@ export class NearContractService {
         this.contract = null;
       }
 
+      // Generate demo data for new users
+      if (this.isSignedIn()) {
+        const userId = this.getAccountId();
+        if (userId) {
+          localStorageManager.generateDemoData(userId);
+        }
+      }
+
       console.log('✅ NEAR contract service initialized successfully');
       console.log('📋 Contract ID:', this.contractId || 'Demo Mode');
       console.log('🔗 Network:', nearConfig.networkId);
@@ -120,11 +129,10 @@ export class NearContractService {
   // Contract interaction methods
   async createIntent(tokenPair: string, minProfitThreshold: string): Promise<any> {
     try {
-      console.log('🚀 Creating intent on NEAR contract...');
+      console.log('🚀 Creating intent...');
       console.log('📊 Token Pair:', tokenPair);
       console.log('💰 Min Profit Threshold:', minProfitThreshold);
       console.log('👤 Account:', this.getAccountId());
-      console.log('🔗 Contract ID:', this.contractId);
 
       if (!this.isSignedIn()) {
         throw new Error('Please connect your NEAR wallet first');
@@ -140,73 +148,65 @@ export class NearContractService {
         throw new Error('Profit threshold must be between 0.1% and 100%');
       }
 
-      // For demo mode or if contract is not available
-      if (!this.contract || !this.contractId || this.contractId === 'demo') {
-        console.log('🎭 Demo mode: Creating intent', { tokenPair, minProfitThreshold });
-        
-        // Simulate processing time
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        
-        const result = {
-          success: true,
-          intentId: `demo-intent-${Date.now()}`,
-          tokenPair,
-          minProfitThreshold,
-          message: 'Intent created successfully in demo mode',
-          txHash: `demo-tx-${Date.now()}`
-        };
-
-        console.log('✅ Demo intent created successfully:', result);
-        return result;
-      }
-
-      // Real contract interaction with better error handling
-      console.log('📝 Calling contract create_intent method...');
+      const userId = this.getAccountId()!;
+      const intentId = `intent-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
       
-      try {
-        // Use the wallet account directly for function calls
-        const account = this.wallet.account();
-        
-        const result = await account.functionCall({
-          contractId: this.contractId,
-          methodName: 'create_intent',
-          args: {
-            token_pair: tokenPair,
-            min_profit_threshold: minProfitThreshold
-          },
-          gas: '300000000000000', // 300 TGas
-          attachedDeposit: '1000000000000000000000000' // 1 NEAR deposit
-        });
+      // Create intent object
+      const newIntent: StoredIntent = {
+        id: intentId,
+        user: userId,
+        token_pair: tokenPair,
+        min_profit_threshold: minProfitThreshold,
+        status: 'active',
+        created_at: Date.now().toString(),
+        source: this.contract ? 'contract' : 'demo'
+      };
 
-        console.log('✅ Intent created successfully on contract:', result);
-        
-        return {
-          success: true,
-          intentId: result.transaction?.hash || `intent-${Date.now()}`,
-          tokenPair,
-          minProfitThreshold,
-          message: 'Intent created successfully on NEAR blockchain',
-          txHash: result.transaction?.hash || 'pending'
-        };
+      // Try contract interaction first, fall back to demo mode
+      let contractResult = null;
+      if (this.contract && this.contractId && this.contractId !== 'demo') {
+        try {
+          console.log('📝 Calling NEAR contract...');
+          
+          // Use the wallet account directly for function calls
+          const account = this.wallet.account();
+          
+          contractResult = await account.functionCall({
+            contractId: this.contractId,
+            methodName: 'create_intent',
+            args: {
+              token_pair: tokenPair,
+              min_profit_threshold: minProfitThreshold
+            },
+            gas: '300000000000000', // 300 TGas
+            attachedDeposit: '1000000000000000000000000' // 1 NEAR deposit
+          });
 
-      } catch (contractError: any) {
-        console.error('❌ Contract call failed:', contractError);
-        
-        // If contract call fails, fall back to demo mode
-        console.log('🎭 Falling back to demo mode due to contract error');
-        
-        const result = {
-          success: true,
-          intentId: `demo-intent-${Date.now()}`,
-          tokenPair,
-          minProfitThreshold,
-          message: 'Intent created successfully (demo mode - contract unavailable)',
-          txHash: `demo-tx-${Date.now()}`
-        };
-
-        console.log('✅ Demo intent created as fallback:', result);
-        return result;
+          console.log('✅ Contract call successful:', contractResult);
+          newIntent.source = 'contract';
+          
+        } catch (contractError: any) {
+          console.warn('⚠️ Contract call failed, using demo mode:', contractError);
+          newIntent.source = 'demo';
+        }
       }
+
+      // Save to localStorage immediately
+      localStorageManager.saveIntent(newIntent);
+      
+      console.log('✅ Intent created and saved:', newIntent);
+      
+      return {
+        success: true,
+        intentId: newIntent.id,
+        tokenPair,
+        minProfitThreshold,
+        message: newIntent.source === 'contract' 
+          ? 'Intent created successfully on NEAR blockchain' 
+          : 'Intent created successfully (demo mode)',
+        txHash: contractResult?.transaction?.hash || `demo-tx-${Date.now()}`,
+        intent: newIntent
+      };
 
     } catch (error: any) {
       console.error('❌ Error creating intent:', error);
@@ -227,65 +227,85 @@ export class NearContractService {
   }
 
   async getUserIntents(): Promise<any[]> {
-    if (!this.contract || !this.isSignedIn()) {
-      // Return demo intents
-      return [
-        {
-          id: 'demo-1',
-          user: this.getAccountId() || 'demo-user',
-          token_pair: 'ETH/USDC',
-          min_profit_threshold: '1.5',
-          status: 'active',
-          created_at: Date.now().toString()
-        },
-        {
-          id: 'demo-2',
-          user: this.getAccountId() || 'demo-user',
-          token_pair: 'BTC/USDC',
-          min_profit_threshold: '2.0',
-          status: 'paused',
-          created_at: (Date.now() - 86400000).toString()
-        }
-      ];
+    const userId = this.getAccountId();
+    if (!userId) {
+      return [];
     }
 
     try {
-      const accountId = this.getAccountId();
-      if (!accountId) {
-        throw new Error('User not signed in');
+      // Always get from localStorage first for immediate display
+      const localIntents = localStorageManager.getIntents(userId);
+      console.log('📋 Local intents loaded:', localIntents.length);
+
+      // Try to sync with contract if available
+      if (this.contract && this.isSignedIn()) {
+        try {
+          console.log('🔄 Syncing with contract...');
+          const account = this.wallet.account();
+          const contractIntents = await account.viewFunction({
+            contractId: this.contractId,
+            methodName: 'get_user_intents',
+            args: { user: userId },
+          });
+          
+          // Merge contract intents with local ones
+          if (contractIntents && contractIntents.length > 0) {
+            contractIntents.forEach((contractIntent: any) => {
+              const existingLocal = localIntents.find(local => 
+                local.token_pair === contractIntent.token_pair && 
+                local.min_profit_threshold === contractIntent.min_profit_threshold
+              );
+              
+              if (!existingLocal) {
+                const syncedIntent: StoredIntent = {
+                  id: contractIntent.id,
+                  user: contractIntent.user,
+                  token_pair: contractIntent.token_pair,
+                  min_profit_threshold: contractIntent.min_profit_threshold,
+                  status: contractIntent.status,
+                  created_at: contractIntent.created_at,
+                  source: 'contract'
+                };
+                localStorageManager.saveIntent(syncedIntent);
+                localIntents.push(syncedIntent);
+              }
+            });
+          }
+          
+          console.log('✅ Contract sync completed');
+        } catch (syncError) {
+          console.warn('⚠️ Contract sync failed, using local data:', syncError);
+        }
       }
 
-      console.log('📋 Fetching user intents from contract...');
-      const account = this.wallet.account();
-      const intents = await account.viewFunction({
-        contractId: this.contractId,
-        methodName: 'get_user_intents',
-        args: { user: accountId },
-      });
-      console.log('✅ Fetched intents:', intents);
-      return intents || [];
+      return localIntents.sort((a, b) => parseInt(b.created_at) - parseInt(a.created_at));
     } catch (error) {
       console.error('❌ Error fetching intents:', error);
-      return [];
+      return localStorageManager.getIntents(userId);
     }
   }
 
   async pauseIntent(intentId: string): Promise<any> {
-    if (!this.contract || !this.isSignedIn()) {
-      console.log('🎭 Demo mode: Pausing intent', intentId);
-      return { success: true, message: 'Intent paused (demo mode)' };
-    }
-
     try {
-      console.log('⏸️ Pausing intent:', intentId);
-      const account = this.wallet.account();
-      const result = await account.functionCall({
-        contractId: this.contractId,
-        methodName: 'pause_intent',
-        args: { intent_id: intentId },
-        gas: '100000000000000' // 100 TGas
-      });
-      console.log('✅ Intent paused successfully:', result);
+      // Update localStorage immediately
+      localStorageManager.updateIntentStatus(intentId, 'paused');
+      
+      if (this.contract && this.isSignedIn()) {
+        try {
+          console.log('⏸️ Pausing intent on contract:', intentId);
+          const account = this.wallet.account();
+          const result = await account.functionCall({
+            contractId: this.contractId,
+            methodName: 'pause_intent',
+            args: { intent_id: intentId },
+            gas: '100000000000000' // 100 TGas
+          });
+          console.log('✅ Intent paused on contract:', result);
+        } catch (contractError) {
+          console.warn('⚠️ Contract pause failed, local update applied:', contractError);
+        }
+      }
+      
       return { success: true, message: 'Intent paused successfully' };
     } catch (error) {
       console.error('❌ Error pausing intent:', error);
@@ -294,21 +314,26 @@ export class NearContractService {
   }
 
   async resumeIntent(intentId: string): Promise<any> {
-    if (!this.contract || !this.isSignedIn()) {
-      console.log('🎭 Demo mode: Resuming intent', intentId);
-      return { success: true, message: 'Intent resumed (demo mode)' };
-    }
-
     try {
-      console.log('▶️ Resuming intent:', intentId);
-      const account = this.wallet.account();
-      const result = await account.functionCall({
-        contractId: this.contractId,
-        methodName: 'resume_intent',
-        args: { intent_id: intentId },
-        gas: '100000000000000' // 100 TGas
-      });
-      console.log('✅ Intent resumed successfully:', result);
+      // Update localStorage immediately
+      localStorageManager.updateIntentStatus(intentId, 'active');
+      
+      if (this.contract && this.isSignedIn()) {
+        try {
+          console.log('▶️ Resuming intent on contract:', intentId);
+          const account = this.wallet.account();
+          const result = await account.functionCall({
+            contractId: this.contractId,
+            methodName: 'resume_intent',
+            args: { intent_id: intentId },
+            gas: '100000000000000' // 100 TGas
+          });
+          console.log('✅ Intent resumed on contract:', result);
+        } catch (contractError) {
+          console.warn('⚠️ Contract resume failed, local update applied:', contractError);
+        }
+      }
+      
       return { success: true, message: 'Intent resumed successfully' };
     } catch (error) {
       console.error('❌ Error resuming intent:', error);
@@ -321,44 +346,77 @@ export class NearContractService {
     nearPrice: string, 
     ethPrice: string
   ): Promise<any> {
-    if (!this.contract || !this.isSignedIn()) {
-      console.log('🎭 Demo mode: Executing arbitrage', { intentId, nearPrice, ethPrice });
-      const profit = Math.abs(parseFloat(nearPrice) - parseFloat(ethPrice)) * 0.8;
-      return {
-        success: true,
-        executionId: `demo-execution-${Date.now()}`,
-        profit: profit.toString(),
-        message: 'Arbitrage executed (demo mode)'
-      };
-    }
-
     try {
-      console.log('⚡ Executing arbitrage on NEAR contract...');
+      const userId = this.getAccountId();
+      if (!userId) {
+        throw new Error('User not signed in');
+      }
+
+      console.log('⚡ Executing arbitrage...');
       console.log('🎯 Intent ID:', intentId);
       console.log('💎 NEAR Price:', nearPrice);
       console.log('🔷 ETH Price:', ethPrice);
 
-      const account = this.wallet.account();
-      const result = await account.functionCall({
-        contractId: this.contractId,
-        methodName: 'execute_arbitrage',
-        args: {
-          intent_id: intentId,
-          near_price: nearPrice,
-          eth_price: ethPrice
-        },
-        gas: '300000000000000', // 300 TGas
-        attachedDeposit: '100000000000000000000000' // 0.1 NEAR deposit
-      });
-
       const profit = Math.abs(parseFloat(nearPrice) - parseFloat(ethPrice)) * 0.8;
+      const executionId = `execution-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
       
-      console.log('✅ Arbitrage executed successfully:', result);
+      // Create execution object
+      const newExecution: StoredExecution = {
+        id: executionId,
+        intent_id: intentId,
+        user: userId,
+        token_pair: 'ETH/USDC', // Get from intent
+        price_diff: Math.abs(parseFloat(nearPrice) - parseFloat(ethPrice)).toString(),
+        profit: profit.toString(),
+        gas_fees: '0.01',
+        tx_hash: `tx-${Date.now()}`,
+        timestamp: Date.now().toString(),
+        near_price: nearPrice,
+        eth_price: ethPrice,
+        source: this.contract ? 'contract' : 'demo'
+      };
+
+      // Try contract execution
+      if (this.contract && this.isSignedIn()) {
+        try {
+          const account = this.wallet.account();
+          const result = await account.functionCall({
+            contractId: this.contractId,
+            methodName: 'execute_arbitrage',
+            args: {
+              intent_id: intentId,
+              near_price: nearPrice,
+              eth_price: ethPrice
+            },
+            gas: '300000000000000', // 300 TGas
+            attachedDeposit: '100000000000000000000000' // 0.1 NEAR deposit
+          });
+
+          newExecution.tx_hash = result.transaction?.hash || newExecution.tx_hash;
+          newExecution.source = 'contract';
+          console.log('✅ Contract execution successful:', result);
+        } catch (contractError) {
+          console.warn('⚠️ Contract execution failed, using demo mode:', contractError);
+          newExecution.source = 'demo';
+        }
+      }
+
+      // Save execution to localStorage
+      localStorageManager.saveExecution(newExecution);
+      
+      // Update intent status to executed
+      localStorageManager.updateIntentStatus(intentId, 'executed');
+      
+      console.log('✅ Arbitrage executed and saved:', newExecution);
+      
       return {
         success: true,
-        executionId: result.transaction?.hash || `execution-${Date.now()}`,
+        executionId: newExecution.id,
         profit: profit.toString(),
-        message: 'Arbitrage executed successfully'
+        message: newExecution.source === 'contract' 
+          ? 'Arbitrage executed successfully on NEAR blockchain'
+          : 'Arbitrage executed successfully (demo mode)',
+        execution: newExecution
       };
     } catch (error) {
       console.error('❌ Error executing arbitrage:', error);
@@ -367,85 +425,103 @@ export class NearContractService {
   }
 
   async getExecutionHistory(): Promise<any[]> {
-    if (!this.contract || !this.isSignedIn()) {
-      // Return demo execution history
-      return [
-        {
-          id: 'demo-exec-1',
-          intent_id: 'demo-1',
-          user: this.getAccountId() || 'demo-user',
-          token_pair: 'ETH/USDC',
-          price_diff: '45.50',
-          profit: '36.40',
-          gas_fees: '0.01',
-          tx_hash: 'demo-tx-hash-1',
-          timestamp: Date.now().toString(),
-          near_price: '3000.00',
-          eth_price: '2954.50'
-        },
-        {
-          id: 'demo-exec-2',
-          intent_id: 'demo-2',
-          user: this.getAccountId() || 'demo-user',
-          token_pair: 'BTC/USDC',
-          price_diff: '850.00',
-          profit: '680.00',
-          gas_fees: '0.02',
-          tx_hash: 'demo-tx-hash-2',
-          timestamp: (Date.now() - 3600000).toString(),
-          near_price: '45000.00',
-          eth_price: '44150.00'
-        }
-      ];
+    const userId = this.getAccountId();
+    if (!userId) {
+      return [];
     }
 
     try {
-      const accountId = this.getAccountId();
-      if (!accountId) {
-        throw new Error('User not signed in');
+      // Get from localStorage first
+      const localExecutions = localStorageManager.getExecutions(userId);
+      console.log('📈 Local executions loaded:', localExecutions.length);
+
+      // Try to sync with contract if available
+      if (this.contract && this.isSignedIn()) {
+        try {
+          console.log('🔄 Syncing execution history with contract...');
+          const account = this.wallet.account();
+          const contractExecutions = await account.viewFunction({
+            contractId: this.contractId,
+            methodName: 'get_execution_history',
+            args: { user: userId },
+          });
+          
+          // Merge contract executions with local ones
+          if (contractExecutions && contractExecutions.length > 0) {
+            contractExecutions.forEach((contractExecution: any) => {
+              const existingLocal = localExecutions.find(local => 
+                local.tx_hash === contractExecution.tx_hash
+              );
+              
+              if (!existingLocal) {
+                const syncedExecution: StoredExecution = {
+                  id: contractExecution.id,
+                  intent_id: contractExecution.intent_id,
+                  user: contractExecution.user,
+                  token_pair: contractExecution.token_pair,
+                  price_diff: contractExecution.price_diff,
+                  profit: contractExecution.profit,
+                  gas_fees: contractExecution.gas_fees,
+                  tx_hash: contractExecution.tx_hash,
+                  timestamp: contractExecution.timestamp,
+                  near_price: contractExecution.near_price,
+                  eth_price: contractExecution.eth_price,
+                  source: 'contract'
+                };
+                localStorageManager.saveExecution(syncedExecution);
+                localExecutions.push(syncedExecution);
+              }
+            });
+          }
+          
+          console.log('✅ Execution history sync completed');
+        } catch (syncError) {
+          console.warn('⚠️ Execution history sync failed, using local data:', syncError);
+        }
       }
 
-      console.log('📈 Fetching execution history from contract...');
-      const account = this.wallet.account();
-      const history = await account.viewFunction({
-        contractId: this.contractId,
-        methodName: 'get_execution_history',
-        args: { user: accountId },
-      });
-      console.log('✅ Fetched execution history:', history);
-      return history || [];
+      return localExecutions.sort((a, b) => parseInt(b.timestamp) - parseInt(a.timestamp));
     } catch (error) {
       console.error('❌ Error fetching execution history:', error);
-      return [];
+      return localStorageManager.getExecutions(userId);
     }
   }
 
   async getTotalProfit(): Promise<string> {
-    if (!this.contract || !this.isSignedIn()) {
-      // Return demo profit
-      return '716.40'; // Sum of demo profits
+    const userId = this.getAccountId();
+    if (!userId) {
+      return '0';
     }
 
     try {
-      const accountId = this.getAccountId();
-      if (!accountId) {
-        throw new Error('User not signed in');
+      // Get from localStorage first
+      const localProfit = localStorageManager.getTotalProfit(userId);
+      console.log('💰 Local total profit:', localProfit);
+
+      // Try to sync with contract if available
+      if (this.contract && this.isSignedIn()) {
+        try {
+          console.log('🔄 Syncing profit with contract...');
+          const account = this.wallet.account();
+          const contractProfit = await account.viewFunction({
+            contractId: this.contractId,
+            methodName: 'get_total_profit',
+            args: { user: userId },
+          });
+          
+          if (contractProfit && parseFloat(contractProfit) > 0) {
+            console.log('✅ Contract profit sync completed:', contractProfit);
+            return contractProfit;
+          }
+        } catch (syncError) {
+          console.warn('⚠️ Profit sync failed, using local data:', syncError);
+        }
       }
 
-      console.log('💰 Fetching total profit from contract...');
-      const account = this.wallet.account();
-      const profit = await account.viewFunction({
-        contractId: this.contractId,
-        methodName: 'get_total_profit',
-        args: { user: accountId },
-      });
-      console.log('✅ Fetched total profit:', profit);
-      
-      // Convert from yoctoNEAR to NEAR if needed
-      return profit || '0';
+      return localProfit.toString();
     } catch (error) {
       console.error('❌ Error fetching total profit:', error);
-      return '0';
+      return localStorageManager.getTotalProfit(userId).toString();
     }
   }
 
@@ -456,8 +532,8 @@ export class NearContractService {
         name: 'ArbitrageAI Cross-Chain Agent (Demo)',
         version: '1.0.0',
         owner: this.getAccountId() || 'demo-user',
-        total_intents: 2,
-        total_executions: 2,
+        total_intents: localStorageManager.getIntents().length,
+        total_executions: localStorageManager.getExecutions().length,
         mode: 'demo'
       };
     }
@@ -478,8 +554,8 @@ export class NearContractService {
         name: 'ArbitrageAI Cross-Chain Agent',
         version: '1.0.0',
         owner: this.getAccountId(),
-        total_intents: 0,
-        total_executions: 0,
+        total_intents: localStorageManager.getIntents().length,
+        total_executions: localStorageManager.getExecutions().length,
         mode: 'fallback'
       };
     }
@@ -504,6 +580,19 @@ export class NearContractService {
 
   parseNearAmount(amount: string): string {
     return amount; // Simplified for demo
+  }
+
+  // Local storage management
+  clearLocalData(): void {
+    localStorageManager.clearAllData();
+  }
+
+  exportData(): string {
+    return localStorageManager.exportData();
+  }
+
+  importData(jsonData: string): boolean {
+    return localStorageManager.importData(jsonData);
   }
 }
 
