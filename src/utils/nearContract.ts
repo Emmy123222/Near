@@ -1,12 +1,6 @@
 import { connect, Contract, keyStores, WalletConnection, utils } from 'near-api-js';
 import { FunctionCallOptions } from 'near-api-js/lib/account';
 
-// Ensure Buffer is available
-if (typeof window !== 'undefined' && !window.Buffer) {
-  const { Buffer } = require('buffer');
-  window.Buffer = Buffer;
-}
-
 // NEAR configuration
 const nearConfig = {
   networkId: 'testnet',
@@ -224,7 +218,7 @@ export class NearContractService {
         throw new Error('Transaction was rejected. Please try again.');
       } else if (error.message?.includes('network')) {
         throw new Error('Network error. Please check your connection and try again.');
-      } else if (error.message?.includes('Buffer')) {
+      } else if (error.message?.includes('Buffer') || error.message?.includes('require')) {
         throw new Error('Browser compatibility issue. Please refresh the page and try again.');
       }
       

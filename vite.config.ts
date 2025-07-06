@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [react()],
   define: {
     global: 'globalThis',
-    // Add Buffer polyfill
+    // Add process.env polyfill
     'process.env': {},
   },
   resolve: {
