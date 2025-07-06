@@ -478,4 +478,4 @@ export const HistoryPage: React.FC = () => {
       </Card>
     </div>
   );
-};
+};this
